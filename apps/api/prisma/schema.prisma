@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Roles within a company
+enum MembershipRole {
+  OWNER
+  MANAGER
+  DISPATCHER
+  TECHNICIAN
+}
+
+enum MembershipStatus {
+  ACTIVE
+  INVITED
+  SUSPENDED
+}
+
+// Company using Serviq
+model Tenant {
+  id            String  @id @default(uuid()) @db.Uuid
+  name          String
+  slug          String  @unique
+  defaultLocale String  @default("fr")
+  isActive      Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships Membership[]
+}
+
+// Global user account
+model User {
+  id                      String                   @id @default(uuid()) @db.Uuid
+  email                   String                   @unique
+  fullName                String
+  passwordHash            String?
+  isActive                Boolean                  @default(true)
+  emailVerificationTokens EmailVerificationToken[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships Membership[]
+}
+
+// User membership within a company
+model Membership {
+  id String @id @default(uuid()) @db.Uuid
+
+  tenantId String @db.Uuid
+  userId   String @db.Uuid
+
+  emailVerificationTokens EmailVerificationToken[]
+
+  role   MembershipRole
+  status MembershipStatus @default(INVITED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([tenantId, userId])
+  @@index([userId])
+  @@index([tenantId, status])
+}
+
+model EmailVerificationToken {
+  id String @id @default(uuid()) @db.Uuid
+
+  userId       String @db.Uuid
+  membershipId String @db.Uuid
+
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  membership Membership @relation(fields: [membershipId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([membershipId])
+  @@index([expiresAt])
+}

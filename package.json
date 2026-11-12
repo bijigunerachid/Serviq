@@ -1,0 +1,23 @@
+
+{
+  "name": "serviq",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Serviq Field Service Management Platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace @serviq/web",
+    "dev:api": "npm run start:dev --workspace @serviq/api",
+    "dev:mobile": "npm run start --workspace @serviq/mobile",
+    "build:web": "npm run build --workspace @serviq/web",
+    "build:api": "npm run build --workspace @serviq/api",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
