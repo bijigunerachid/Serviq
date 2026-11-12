@@ -12,4 +12,9 @@ export class HealthController {
   getHealth() {
     return this.healthService.getHealth();
   }
+
+  @Get('database')
+  getDatabaseHealth() {
+    return this.healthService.getDatabaseHealth();
+  }
 }
