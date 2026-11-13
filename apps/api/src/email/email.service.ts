@@ -45,7 +45,7 @@ export class EmailService {
         token: string,
     ): Promise<void> {
         const verificationUrl = new URL(
-            '/verify-email',
+            '/fr/verify-email',
             'http://localhost:3001',
         );
 
